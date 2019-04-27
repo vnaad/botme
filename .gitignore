@@ -1,0 +1,7 @@
+.bin
+venv
+SHREOS
+
+__pycache__/
+*.pyc
+*.egg-info/
