@@ -1,0 +1,2 @@
+# botme
+bot mimics me
