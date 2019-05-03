@@ -46,6 +46,7 @@ class FileParser(object):
 		return cleanedMessage
 
 	def load_line(self, name, ts, msg):
+		ts = 9999999999999 - ts
 		indata = { "n" : name , "d": ts , "m" : msg }
 		inkey = "{0}-{1}".format(ts,name)
 		self.bt.put(bytes(inkey,'utf-8'), bytes(json.dumps(indata),'utf-8') )
