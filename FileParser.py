@@ -12,11 +12,13 @@ import os
 from collections import OrderedDict
 from pathlib import Path
 import plyvel
+import numpy as np
 
 class FileParser(object):
 
 	data = OrderedDict()
 	lastline = 0
+	myname = ""
 
 	def __init__(self, myname,dbpath):
 		self.myname = myname
@@ -56,7 +58,35 @@ class FileParser(object):
 		for message in ds['messages']:
 			self.load_line( message['sender_name'], message['timestamp_ms'], self.clean_up( message['content'] ) )
 		
-	def show_data(self):
-		for key, value in self.db.iterator(prefix=b''):
-			print(key,value)
+	def do_train(self, key, value):
+		print(key,value)
 		
+	def save_data(self):
+		combinedDictionary = {}
+		responseDictionary = dict()
+		oldname = 'xxx'
+		meSpeak = ""
+		otherSpeak = ""
+		for key, value in self.db.iterator(prefix=b''):
+			value=json.loads(value)
+			print(value)
+
+			newname = 'other'
+			if (value['n']==self.myname): newname=self.myname
+
+			if ( newname != oldname ):
+				if (len(meSpeak) > 1 and len(otherSpeak) >1 ):
+					self.do_train(otherSpeak,meSpeak)
+					meSpeak , otherSpeak = '' , ''
+
+			if (newname == self.myname):
+				meSpeak += " " + value['m']
+			else:
+				otherSpeak += " " + value['m']
+
+			oldname=newname
+
+		## last line if
+		if (len(meSpeak) > 1 and len(otherSpeak) >1 ):
+			self.do_train(otherSpeak,meSpeak)
+			meSpeak , otherSpeak = '' , ''
